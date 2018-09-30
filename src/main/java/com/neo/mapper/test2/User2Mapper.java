@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.*;
 
 public interface User2Mapper {
 
-
 	@Select("SELECT * FROM users")
 	@Results({
 			@Result(property = "userSex",  column = "user_sex", javaType = UserSexEnum.class),
@@ -23,10 +22,10 @@ public interface User2Mapper {
 	})
 	UserEntity getOne(Long id);
 
-	@Insert("INSERT INTO users(userName,passWord,user_sex,nick_name) VALUES(#{userName}, #{passWord}, #{userSex}, #{nickName})")
+	@Insert("INSERT INTO users(user_name,pass_word,user_sex,nick_name) VALUES(#{userName}, #{passWord}, #{userSex}, #{nickName})")
 	void insert(UserEntity user);
 
-	@Update("UPDATE users SET userName=#{userName},nick_name=#{nickName} WHERE id =#{id}")
+	@Update("UPDATE users SET user_name=#{userName},nick_name=#{nickName} WHERE id =#{id}")
 	void update(UserEntity user);
 
 	@Delete("DELETE FROM users WHERE id =#{id}")
