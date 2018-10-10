@@ -1,9 +1,11 @@
 package com.neo.adapters;
 
+import com.neo.datasource.MyApplicationRunner;
 import com.neo.entity.po.RelationInfo;
 import com.neo.entity.vo.RowItem;
 import com.neo.mapper.test1.RelationInfoMapper;
 import com.neo.util.SpringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +20,8 @@ import java.util.Map;
  */
 @Component
 public class DataFormatAdapter {
+
+    private static Logger logger = Logger.getLogger(MyApplicationRunner.class);
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -41,15 +45,7 @@ public class DataFormatAdapter {
             relationInfoTemp = relationInfoList.get(i);
             gsMap.put(relationInfoTemp.getType(),relationInfoTemp);
         }
-        System.out.println("--------------------");
-        /**
-        RelationInfo relationInfo = new RelationInfo();
-        relationInfo.setId(1);
-        relationInfo.setType("我-0");
-        relationInfo.setEntityClass("com.neo.entity.po.CustomerInfo");
-        relationInfo.setMapperClass("com.neo.mapper.test1.CustomerInfoMapper");
-        gsMap.put("我-0", relationInfo);
-         **/
+        logger.info(DataFormatAdapter.class.getName()+" init finished!");
     }
 
     private List castData(String type, List source) throws Exception{
