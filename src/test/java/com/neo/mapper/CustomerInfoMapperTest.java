@@ -44,7 +44,7 @@ public class CustomerInfoMapperTest {
 
         ReadExcel obj = new ReadExcel();
         // 此处为我创建Excel路径：E:/zhanhj/studysrc/jxl下
-        File file = new File("D:/temp.xls");
+        File file = new File("./src/main/resources/temp.xls");
         List excelList = obj.readExcel(file, 0, 3, 1000);
         List<CustomerInfo> customerInfoList = new ArrayList<>();
         CustomerInfo customerInfo = null;
@@ -64,7 +64,7 @@ public class CustomerInfoMapperTest {
 
     @Test
     public void testAdapterInsert() throws Exception {
-         String filePath = "D:/temp.xls";
+         String filePath = "./src/main/resources/temp.xls";
          int sheetIndex = 0;
          int startRnum = 3;
          int endRnum = 1000;
@@ -74,7 +74,8 @@ public class CustomerInfoMapperTest {
 
     @Test
     public void testThreadInsert() throws Exception {
-        SubTaskThread subTaskThread = new SubTaskThread("D:/temp.xls",0,3,1000);
+        //SubTaskThread subTaskThread = new SubTaskThread("D:/temp.xls",0,3,1000);
+        SubTaskThread subTaskThread = new SubTaskThread("./src/main/resources/temp.xls",0,3,1000);
         subTaskThread.start();
         Thread.sleep(10000);
     }
