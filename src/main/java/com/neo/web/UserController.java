@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.neo.entity.UserEntity;
+import com.neo.entity.po.User;
 import com.neo.mapper.test2.User2Mapper;
 
 @RestController
@@ -24,24 +24,24 @@ public class UserController {
 	private User2Mapper user2Mapper;
 	
 	@RequestMapping("/getUsers")
-	public List<UserEntity> getUsers() {
-		List<UserEntity> users=user1Mapper.getAll();
+	public List<User> getUsers() {
+		List<User> users=user1Mapper.getAll();
 		return users;
 	}
 	
     @RequestMapping("/getUser")
-    public UserEntity getUser(Long id) {
-    	UserEntity user=user2Mapper.getOne(id);
+    public User getUser(Long id) {
+    	User user=user2Mapper.getOne(id);
         return user;
     }
     
     @RequestMapping("/add")
-    public void save(@RequestBody UserEntity user) {
+    public void save(@RequestBody User user) {
         user2Mapper.insert(user);
     }
     
     @RequestMapping(value="update")
-    public void update(@RequestBody UserEntity user) {
+    public void update(@RequestBody User user) {
         user2Mapper.update(user);
     }
     

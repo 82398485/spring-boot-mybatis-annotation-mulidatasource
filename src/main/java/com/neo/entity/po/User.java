@@ -1,10 +1,10 @@
-package com.neo.entity;
+package com.neo.entity.po;
 
 import com.neo.enums.UserSexEnum;
 
 import java.io.Serializable;
 
-public class UserEntity implements Serializable {
+public class User implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Long id;
@@ -13,11 +13,11 @@ public class UserEntity implements Serializable {
 	private UserSexEnum userSex;
 	private String nickName;
 
-	public UserEntity() {
+	public User() {
 		super();
 	}
 
-	public UserEntity(String userName, String passWord, UserSexEnum userSex,String nickName) {
+	public User(String userName, String passWord, UserSexEnum userSex, String nickName) {
 		super();
 		this.passWord = passWord;
 		this.userName = userName;
@@ -25,7 +25,7 @@ public class UserEntity implements Serializable {
 		this.nickName = nickName;
 	}
 
-	public UserEntity(String userName, String passWord, UserSexEnum userSex) {
+	public User(String userName, String passWord, UserSexEnum userSex) {
 		super();
 		this.passWord = passWord;
 		this.userName = userName;
