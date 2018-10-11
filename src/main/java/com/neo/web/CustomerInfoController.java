@@ -39,5 +39,4 @@ public class CustomerInfoController {
         ApplicationContext applicationContext = SpringUtils.getApplicationContext();
         return applicationContext.toString();
     }
-    
 }

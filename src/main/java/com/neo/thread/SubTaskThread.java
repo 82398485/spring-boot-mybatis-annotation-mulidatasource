@@ -1,6 +1,10 @@
 package com.neo.thread;
 
 import com.neo.adapters.DataFormatAdapter;
+import com.neo.entity.vo.SheetType;
+import com.neo.enums.SubTaskStatusEnum;
+import com.neo.mapper.test1.SubTaskInfoMapper;
+import com.neo.util.FileUtils;
 import com.neo.util.ReadExcel;
 import com.neo.util.SpringUtils;
 
@@ -13,12 +17,15 @@ import java.util.List;
 public class SubTaskThread extends Thread{
 
     private DataFormatAdapter dataFormatAdapter;
+    private SubTaskInfoMapper subTaskInfoMapper;
+    private int subTaskInfoId;
     private String filePath;
     private int sheetIndex;
     private int startRnum;
     private int endRnum;
 
-    public SubTaskThread(String filePath,int sheetIndex,int startRnum,int endRnum){
+    public SubTaskThread(int subTaskInfoId,String filePath,int sheetIndex,int startRnum,int endRnum){
+        this.subTaskInfoId = subTaskInfoId;
         this.filePath = filePath;
         this.sheetIndex = sheetIndex;
         this.startRnum = startRnum;
@@ -27,9 +34,14 @@ public class SubTaskThread extends Thread{
 
     @Override
     public void run(){
+        subTaskInfoMapper = SpringUtils.getBean(SubTaskInfoMapper.class);
+        //更新任务状态为处理中
+        subTaskInfoMapper.updateStatus(subTaskInfoId, SubTaskStatusEnum.TYPE_TREATING.value);
         dataFormatAdapter = SpringUtils.getBean(DataFormatAdapter.class);
         List excelList = ReadExcel.readExcel(new File(filePath), sheetIndex, startRnum, endRnum);
-        this.dataFormatAdapter.processData("我-0",excelList);
+        this.dataFormatAdapter.processData(FileUtils.getFileName(filePath),sheetIndex,excelList);
+        //更新任务状态为处理完成-成功
+        subTaskInfoMapper.updateStatusAndEndDate(subTaskInfoId, SubTaskStatusEnum.TYPE_TREATED_SUCCESS.value);
     }
 
     public String getFilePath() {
@@ -63,4 +75,5 @@ public class SubTaskThread extends Thread{
     public void setEndRnum(int endRnum) {
         this.endRnum = endRnum;
     }
+
 }

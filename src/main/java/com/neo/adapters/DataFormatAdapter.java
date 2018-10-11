@@ -3,6 +3,7 @@ package com.neo.adapters;
 import com.neo.datasource.MyApplicationRunner;
 import com.neo.entity.po.RelationInfo;
 import com.neo.entity.vo.RowItem;
+import com.neo.entity.vo.SheetType;
 import com.neo.mapper.test1.RelationInfoMapper;
 import com.neo.util.SpringUtils;
 import org.apache.log4j.Logger;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by songcj on 2018/10/9.
@@ -22,34 +25,53 @@ import java.util.Map;
 public class DataFormatAdapter {
 
     private static Logger logger = Logger.getLogger(MyApplicationRunner.class);
-
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private RelationInfoMapper relationInfoMapper;
+    private Map<SheetType,RelationInfo> gsMap;
 
-    private Map<String,RelationInfo> gsMap;
-
-    public Map<String, RelationInfo> getGsMap() {
+    public Map<SheetType, RelationInfo> getGsMap() {
         return gsMap;
     }
 
-    public void setGsMap(Map<String, RelationInfo> gsMap) {
+    public void setGsMap(Map<SheetType, RelationInfo> gsMap) {
         this.gsMap = gsMap;
     }
 
     public void init(){
-        gsMap=new HashMap<String, RelationInfo>();
+        gsMap=new HashMap<SheetType, RelationInfo>();
         List<RelationInfo> relationInfoList =  relationInfoMapper.getAll();
         RelationInfo relationInfoTemp = null;
         for(int i=0;relationInfoList!=null&&i<relationInfoList.size();i++){
             relationInfoTemp = relationInfoList.get(i);
-            gsMap.put(relationInfoTemp.getType(),relationInfoTemp);
+            gsMap.put(new SheetType(relationInfoTemp.getFilePattern(),relationInfoTemp.getSheetIndex()),relationInfoTemp);
         }
         logger.info(DataFormatAdapter.class.getName()+" init finished!");
     }
 
-    private List castData(String type, List source) throws Exception{
-        RelationInfo relationInfo = this.gsMap.get(type);
+    public RelationInfo findSheetType(String fileName,int sheetIndex){
+        SheetType matchKey = null;
+        for(SheetType sheetTypeTemp : this.gsMap.keySet()){
+            if(sheetTypeTemp.getSheetIndex()!=sheetIndex){
+                continue;
+            }
+            Pattern p = Pattern.compile(sheetTypeTemp.getFilePattern());
+            Matcher matcher = p.matcher(fileName);
+            if(matcher.matches()){
+                matchKey = sheetTypeTemp;
+                break;
+            }
+        }
+
+        if(matchKey!=null){
+            return this.gsMap.get(matchKey);
+        }else{
+            return null;
+        }
+    }
+
+    private List castData(String fileName,int sheetIndex, List source) throws Exception{
+        RelationInfo relationInfo = this.findSheetType(fileName,sheetIndex);
         String entityClassName = relationInfo.getEntityClass();
         String mapperClassName = relationInfo.getMapperClass();
 
@@ -68,8 +90,8 @@ public class DataFormatAdapter {
         return result;
     }
 
-    private void insertData(String type, List result) throws Exception{
-        RelationInfo relationInfo = this.gsMap.get(type);
+    private void insertData(String fileName,int sheetIndex, List result) throws Exception{
+        RelationInfo relationInfo = this.findSheetType(fileName,sheetIndex);;
         String mapperClassName = relationInfo.getMapperClass();
         Class mapperClass = Class.forName(mapperClassName);
         Method method = mapperClass.getMethod("insertBatch",List.class);
@@ -77,10 +99,10 @@ public class DataFormatAdapter {
         method.invoke(object,result);
     }
 
-    public void processData(String type, List source){
+    public void processData(String fileName, int sheetIndex, List source){
         try {
-            List list = this.castData(type, source);
-            this.insertData(type,list);
+            List list = this.castData(fileName,sheetIndex, source);
+            this.insertData(fileName,sheetIndex,list);
         } catch (Exception e) {
             e.printStackTrace();
         }

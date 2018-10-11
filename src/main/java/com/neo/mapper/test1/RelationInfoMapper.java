@@ -15,9 +15,13 @@ public interface RelationInfoMapper {
     @Select("SELECT * FROM relationInfo")
     @Results({
             @Result(property = "id",  column = "id"),
-            @Result(property = "type",  column = "type"),
+            @Result(property = "filePattern",  column = "filePattern"),
+            @Result(property = "sheetIndex",  column = "sheetIndex"),
+            @Result(property = "minStartRnum",  column = "minStartRnum"),
+            @Result(property = "batchCount",  column = "batchCount"),
             @Result(property = "entityClass", column = "entityClass"),
-            @Result(property = "mapperClass", column = "mapperClass")
+            @Result(property = "mapperClass", column = "mapperClass"),
+            @Result(property = "msg", column = "msg")
     })
     List<RelationInfo> getAll();
 }

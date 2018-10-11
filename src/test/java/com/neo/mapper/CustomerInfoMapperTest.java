@@ -3,7 +3,9 @@ package com.neo.mapper;
 import com.neo.entity.po.CustomerInfo;
 import com.neo.adapters.DataFormatAdapter;
 import com.neo.mapper.test1.CustomerInfoMapper;
+import com.neo.mapper.test1.SubTaskInfoMapper;
 import com.neo.thread.SubTaskThread;
+import com.neo.util.FileUtils;
 import com.neo.util.ReadExcel;
 import com.neo.entity.vo.RowItem;
 import org.junit.Assert;
@@ -27,7 +29,7 @@ public class CustomerInfoMapperTest {
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private CustomerInfoMapper customerInfoMapper;
-
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     private DataFormatAdapter dataFormatAdapter;
 
@@ -69,17 +71,16 @@ public class CustomerInfoMapperTest {
          int startRnum = 3;
          int endRnum = 1000;
          List excelList =  ReadExcel.readExcel(new File(filePath), sheetIndex, startRnum, endRnum);
-         this.dataFormatAdapter.processData("我-0",excelList);
+         this.dataFormatAdapter.processData(FileUtils.getFileName(filePath),sheetIndex,excelList);
     }
 
     @Test
     public void testThreadInsert() throws Exception {
         //SubTaskThread subTaskThread = new SubTaskThread("D:/temp.xls",0,3,1000);
-        SubTaskThread subTaskThread = new SubTaskThread("./src/main/resources/temp.xls",0,3,1000);
+        SubTaskThread subTaskThread = new SubTaskThread(1,"./src/main/resources/temp.xls",0,3,1000);
         subTaskThread.start();
         Thread.sleep(10000);
     }
-
 
     @Test
     public void readExcel() throws Exception {
