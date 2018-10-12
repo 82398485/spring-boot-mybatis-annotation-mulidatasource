@@ -1,17 +1,17 @@
 package com.neo.web;
 
 import com.neo.entity.po.SubTaskInfo;
-import com.neo.mapper.test1.CustomerInfoMapper;
 import com.neo.mapper.test1.SubTaskInfoMapper;
+import com.neo.service.SubTaskInfoService;
 import com.neo.thread.SubTaskThread;
-import com.neo.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by songcj on 2018/10/11.
@@ -23,7 +23,7 @@ public class Controller {
     @Autowired
     private SubTaskInfoMapper subTaskInfoMapper;
     @Autowired
-    private CustomerInfoMapper customerInfoMapper;
+    private SubTaskInfoService subTaskInfoService;
 
     @RequestMapping(value="/insertExcel")
     public String test() {
@@ -44,6 +44,13 @@ public class Controller {
         };
         //Start 非阻塞型， Run为阻塞型
         thread.start();
+        return "success";
+    }
+
+
+    @RequestMapping(value="/createAllSubTask")
+    public String createAllSubTask(){
+        subTaskInfoService.createAllSubTask();
         return "success";
     }
 

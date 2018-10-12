@@ -18,4 +18,17 @@ public enum SubTaskStatusEnum {
         this.value=value;
     }
 
+    public static String keyOf(int value){
+        if(value==TYPE_UNTREATED.value){
+            return TYPE_UNTREATED.type;
+        }else if(value==TYPE_TREATING.value){
+            return TYPE_TREATING.type;
+        }else if(value==TYPE_TREATED_SUCCESS.value){
+            return TYPE_TREATED_SUCCESS.type;
+        }else if(value==TYPE_TREATED_ERROR.value){
+            return TYPE_TREATED_ERROR.type;
+        }
+        return null;
+    }
+
 }

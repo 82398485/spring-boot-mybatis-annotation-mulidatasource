@@ -1,5 +1,6 @@
 package com.neo.util;
 
+import com.neo.entity.vo.FileSheetItemInfo;
 import com.neo.entity.vo.RowItem;
 import jxl.Sheet;
 import jxl.Workbook;
@@ -112,6 +113,10 @@ public class ReadExcel {
     public static List readExcel(File file, int sheetIndex, int startRnum, int endRnum) {
         InputStream is = null;
         Workbook wb = null;
+        String cellinfo = null;
+        List<RowItem> outerList = null;
+        List innerList = null;
+        Sheet sheet = null;
         try {
             // 创建输入流，读取Excel
             is = new FileInputStream(file.getAbsolutePath());
@@ -124,20 +129,18 @@ public class ReadExcel {
                 if(sheetIndex!=index){
                     continue;
                 }
-                List<RowItem> outerList=new ArrayList<RowItem>();
+                outerList=new ArrayList<RowItem>();
                 // 每个页签创建一个Sheet对象
-                Sheet sheet = wb.getSheet(index);
+                sheet = wb.getSheet(index);
                 // sheet.getRows()返回该页的总行数
-                for (int i = 0; i < sheet.getRows(); i++) {
-                    if(i>=startRnum&&i<=endRnum) {
-                        List innerList = new ArrayList();
-                        // sheet.getColumns()返回该页的总列数
-                        for (int j = 0; j < sheet.getColumns(); j++) {
-                            String cellinfo = sheet.getCell(j, i).getContents();
-                            innerList.add(cellinfo);
-                        }
-                        outerList.add(new RowItem(i,innerList));
+                for (int i = startRnum; i<sheet.getRows()&&i<=endRnum; i++) {
+                    innerList = new ArrayList();
+                    // sheet.getColumns()返回该页的总列数
+                    for (int j = 0; j < sheet.getColumns(); j++) {
+                        cellinfo = sheet.getCell(j, i).getContents();
+                        innerList.add(cellinfo);
                     }
+                    outerList.add(new RowItem(i, innerList));
                 }
                 return outerList;
             }
@@ -161,5 +164,54 @@ public class ReadExcel {
         }
         return null;
     }
+
+    /**
+     * 获取EXCEL表格sheet页相关信息
+     * @param file
+     * @return
+     */
+    public static List<FileSheetItemInfo> getFileSheetItemInfos(File file) {
+        List<FileSheetItemInfo> result = new ArrayList<>();
+        FileSheetItemInfo fileSheetItemInfo = null;
+        InputStream is = null;
+        Workbook wb = null;
+        try {
+            // 创建输入流，读取Excel
+            is = new FileInputStream(file.getAbsolutePath());
+            // jxl提供的Workbook类
+            wb = Workbook.getWorkbook(is);
+            // Excel的页签数量
+            int sheet_size = wb.getNumberOfSheets();
+            for (int index = 0; index < sheet_size; index++) {
+                fileSheetItemInfo = new FileSheetItemInfo();
+                // 每个页签创建一个Sheet对象
+                Sheet sheet = wb.getSheet(index);
+                fileSheetItemInfo.setFile(file);
+                fileSheetItemInfo.setSheetIndex(index);
+                fileSheetItemInfo.setTotalRnum(sheet.getRows());
+                result.add(fileSheetItemInfo);
+            }
+            return result;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (BiffException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                if(wb!=null){
+                    wb.close();
+                }
+                if(is!=null){
+                    is.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
 
 }

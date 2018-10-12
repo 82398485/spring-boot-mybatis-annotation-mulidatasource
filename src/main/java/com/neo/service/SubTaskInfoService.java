@@ -1,7 +1,6 @@
-package com.neo.mapper;
+package com.neo.service;
 
 import com.alibaba.fastjson.JSON;
-import com.neo.datasource.MyApplicationRunner;
 import com.neo.entity.po.RelationInfo;
 import com.neo.entity.po.SourceInfo;
 import com.neo.entity.po.SubTaskInfo;
@@ -10,33 +9,25 @@ import com.neo.enums.SubTaskStatusEnum;
 import com.neo.mapper.test1.RelationInfoMapper;
 import com.neo.mapper.test1.SourceInfoMapper;
 import com.neo.mapper.test1.SubTaskInfoMapper;
-import com.neo.thread.SubTaskThread;
 import com.neo.util.FileUtils;
-import com.neo.util.ReadExcel;
 import org.apache.log4j.Logger;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by songcj on 2018/10/11.
+ * Created by songcj on 2018/10/12.
  */
 @SuppressWarnings("SpringJavaAutowiringInspection")
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class SourceInfoMapperTest {
+@Component
+public class SubTaskInfoService {
 
-    private static Logger logger = Logger.getLogger(SourceInfoMapperTest.class);
+    private static Logger logger = Logger.getLogger(SubTaskInfoService.class);
     @Autowired
     private SourceInfoMapper sourceInfoMapper;
     @Autowired
@@ -44,9 +35,7 @@ public class SourceInfoMapperTest {
     @Autowired
     private SubTaskInfoMapper subTaskInfoMapper;
 
-
-    @Test
-    public void testCreateSubTask() throws Exception {
+    public void createAllSubTask() {
 
         //获取目录及文件匹配的信息
         List<SourceInfo> sourceInfoList = this.sourceInfoMapper.getAll();
@@ -76,8 +65,8 @@ public class SourceInfoMapperTest {
                 String path = sourceInfo.getPath();
 
                 //获取该文件的所有Sheet及对应的行数
-                List<FileSheetItemInfo> fileSheetItemInfoList = ReadExcel.getFileSheetItemInfos(file);
-                logger.info("file name="+list.get(j).toString()+"  "+file.getName()+" "+file.getCanonicalPath());
+                List<FileSheetItemInfo> fileSheetItemInfoList = FileUtils.getFileSheetItemInfos(file);
+                logger.info("file name="+list.get(j).toString()+"  "+file.getName());
                 for(FileSheetItemInfo fileSheetItemInfo: fileSheetItemInfoList){
                     List<SubTaskInfo> subTaskInfoList = this.createSubTaskInfos(fileSheetItemInfo,relationInfoList);
                     if(subTaskInfoList!=null&&subTaskInfoList.size()>0){
@@ -93,7 +82,7 @@ public class SourceInfoMapperTest {
 
     }
 
-    private List<SubTaskInfo> createSubTaskInfos(FileSheetItemInfo fileSheetItemInfo,List<RelationInfo> relationInfoList){
+    private List<SubTaskInfo> createSubTaskInfos(FileSheetItemInfo fileSheetItemInfo, List<RelationInfo> relationInfoList){
         List<SubTaskInfo> subTaskInfoList = new ArrayList<>();
         if(relationInfoList==null||relationInfoList.size()<=0){
             return subTaskInfoList;
@@ -130,7 +119,5 @@ public class SourceInfoMapperTest {
         }
         return subTaskInfoList;
     }
-
-
 
 }

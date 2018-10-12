@@ -1,12 +1,15 @@
 package com.neo.thread;
 
+import com.alibaba.fastjson.JSON;
 import com.neo.adapters.DataFormatAdapter;
 import com.neo.entity.vo.SheetType;
 import com.neo.enums.SubTaskStatusEnum;
 import com.neo.mapper.test1.SubTaskInfoMapper;
+import com.neo.service.SubTaskInfoService;
 import com.neo.util.FileUtils;
 import com.neo.util.ReadExcel;
 import com.neo.util.SpringUtils;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.util.List;
@@ -16,6 +19,7 @@ import java.util.List;
  */
 public class SubTaskThread extends Thread{
 
+    private static Logger logger = Logger.getLogger(SubTaskThread.class);
     private DataFormatAdapter dataFormatAdapter;
     private SubTaskInfoMapper subTaskInfoMapper;
     private int subTaskInfoId;
@@ -34,14 +38,31 @@ public class SubTaskThread extends Thread{
 
     @Override
     public void run(){
+        long startTime = System.currentTimeMillis();
+        logger.info("Start process task. ["+ "id="+this.subTaskInfoId+" sheetIndex="+sheetIndex+" startRnum="+startRnum+" endRnum="+endRnum+" filePath="+filePath+"]");
         subTaskInfoMapper = SpringUtils.getBean(SubTaskInfoMapper.class);
         //更新任务状态为处理中
         subTaskInfoMapper.updateStatus(subTaskInfoId, SubTaskStatusEnum.TYPE_TREATING.value);
         dataFormatAdapter = SpringUtils.getBean(DataFormatAdapter.class);
+
+        long startTime1 = System.currentTimeMillis();
         List excelList = ReadExcel.readExcel(new File(filePath), sheetIndex, startRnum, endRnum);
-        this.dataFormatAdapter.processData(FileUtils.getFileName(filePath),sheetIndex,excelList);
-        //更新任务状态为处理完成-成功
-        subTaskInfoMapper.updateStatusAndEndDate(subTaskInfoId, SubTaskStatusEnum.TYPE_TREATED_SUCCESS.value);
+        long endTime1 = System.currentTimeMillis();
+
+        //默认成功
+        int finishedStatus = SubTaskStatusEnum.TYPE_TREATED_SUCCESS.value;
+        try {
+            this.dataFormatAdapter.processData(FileUtils.getFileName(filePath), sheetIndex, excelList);
+        }catch (Exception e){
+            e.printStackTrace();
+            //抛出异常即表示失败
+            finishedStatus = SubTaskStatusEnum.TYPE_TREATED_ERROR.value;
+        }
+
+        //更新任务状态为处理完成（可能处理成功，也可能处理失败）
+        subTaskInfoMapper.updateStatusAndEndDate(subTaskInfoId, finishedStatus);
+        long endTime = System.currentTimeMillis();
+        logger.info("finish process task. cost "+(endTime-startTime)+"[Read cost "+(endTime1-startTime1)+"]. finished status="+SubTaskStatusEnum.keyOf(finishedStatus) +" ["+ "id="+this.subTaskInfoId+" filePath="+filePath+" sheetIndex="+sheetIndex+" startRnum="+startRnum+" endRnum="+endRnum+" filePath="+filePath+"]");
     }
 
     public String getFilePath() {

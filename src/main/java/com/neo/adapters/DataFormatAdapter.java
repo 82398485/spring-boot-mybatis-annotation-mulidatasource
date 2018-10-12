@@ -99,13 +99,9 @@ public class DataFormatAdapter {
         method.invoke(object,result);
     }
 
-    public void processData(String fileName, int sheetIndex, List source){
-        try {
-            List list = this.castData(fileName,sheetIndex, source);
-            this.insertData(fileName,sheetIndex,list);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void processData(String fileName, int sheetIndex, List source) throws Exception{
+        List list = this.castData(fileName,sheetIndex, source);
+        this.insertData(fileName,sheetIndex,list);
     }
 
 }

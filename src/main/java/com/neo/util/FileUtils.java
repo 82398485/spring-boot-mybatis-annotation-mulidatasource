@@ -1,7 +1,6 @@
 package com.neo.util;
 
 import com.neo.entity.vo.FileSheetItemInfo;
-import com.neo.entity.vo.RowItem;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
@@ -18,9 +17,14 @@ import java.util.regex.Pattern;
 public class FileUtils {
 
     public static final String SPLIT_STR_LINUX = "/";
+    public static final String SPLIT_STR_WINDOWS = "\\\\";
 
     public static String getFileName(String filePath){
-        return filePath.split(SPLIT_STR_LINUX)[filePath.split(SPLIT_STR_LINUX).length-1];
+        if(filePath.contains(SPLIT_STR_LINUX)){
+            return filePath.split(SPLIT_STR_LINUX)[filePath.split(SPLIT_STR_LINUX).length-1];
+        }else{
+            return filePath.split(SPLIT_STR_WINDOWS)[filePath.split(SPLIT_STR_WINDOWS).length-1];
+        }
     }
 
     public static List<String> getFiles(String path) {
@@ -56,53 +60,6 @@ public class FileUtils {
         return files;
     }
 
-    /**
-     * 获取EXCEL表格sheet页相关信息
-     * @param file
-     * @return
-     */
-    public static List<FileSheetItemInfo> getFileSheetItemInfos(File file) {
-        List<FileSheetItemInfo> result = new ArrayList<>();
-        FileSheetItemInfo fileSheetItemInfo = null;
-        InputStream is = null;
-        Workbook wb = null;
-        try {
-            // 创建输入流，读取Excel
-            is = new FileInputStream(file.getAbsolutePath());
-            // jxl提供的Workbook类
-            wb = Workbook.getWorkbook(is);
-            // Excel的页签数量
-            int sheet_size = wb.getNumberOfSheets();
-            for (int index = 0; index < sheet_size; index++) {
-                fileSheetItemInfo = new FileSheetItemInfo();
-                // 每个页签创建一个Sheet对象
-                Sheet sheet = wb.getSheet(index);
-                fileSheetItemInfo.setFile(file);
-                fileSheetItemInfo.setSheetIndex(index);
-                fileSheetItemInfo.setTotalRnum(sheet.getRows());
-                result.add(fileSheetItemInfo);
-            }
-            return result;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (BiffException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            try {
-                if(wb!=null){
-                    wb.close();
-                }
-                if(is!=null){
-                    is.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
 
 
 
