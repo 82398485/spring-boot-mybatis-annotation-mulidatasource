@@ -51,12 +51,16 @@ public class SubTaskThread extends Thread{
 
         //默认成功
         int finishedStatus = SubTaskStatusEnum.TYPE_TREATED_SUCCESS.value;
-        try {
-            this.dataFormatAdapter.processData(FileUtils.getFileName(filePath), sheetIndex, excelList);
-        }catch (Exception e){
-            e.printStackTrace();
-            //抛出异常即表示失败
-            finishedStatus = SubTaskStatusEnum.TYPE_TREATED_ERROR.value;
+        if(excelList!=null&&excelList.size()>0){
+            try {
+                this.dataFormatAdapter.processData(FileUtils.getFileName(filePath), sheetIndex, excelList);
+            }catch (Exception e){
+                e.printStackTrace();
+                //抛出异常即表示失败
+                finishedStatus = SubTaskStatusEnum.TYPE_TREATED_ERROR.value;
+            }
+        }else{
+            logger.error("excellist selected rows is empty. ["+ "id="+this.subTaskInfoId+" sheetIndex="+sheetIndex+" startRnum="+startRnum+" endRnum="+endRnum+" filePath="+filePath+"]");
         }
 
         //更新任务状态为处理完成（可能处理成功，也可能处理失败）
