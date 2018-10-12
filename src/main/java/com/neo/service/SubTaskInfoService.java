@@ -10,6 +10,7 @@ import com.neo.mapper.test1.RelationInfoMapper;
 import com.neo.mapper.test1.SourceInfoMapper;
 import com.neo.mapper.test1.SubTaskInfoMapper;
 import com.neo.util.FileUtils;
+import com.neo.util.ReadExcel;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -65,7 +66,7 @@ public class SubTaskInfoService {
                 String path = sourceInfo.getPath();
 
                 //获取该文件的所有Sheet及对应的行数
-                List<FileSheetItemInfo> fileSheetItemInfoList = FileUtils.getFileSheetItemInfos(file);
+                List<FileSheetItemInfo> fileSheetItemInfoList = ReadExcel.getFileSheetItemInfos(file);
                 logger.info("file name="+list.get(j).toString()+"  "+file.getName());
                 for(FileSheetItemInfo fileSheetItemInfo: fileSheetItemInfoList){
                     List<SubTaskInfo> subTaskInfoList = this.createSubTaskInfos(fileSheetItemInfo,relationInfoList);
