@@ -11,7 +11,7 @@
  Target Server Version : 50723
  File Encoding         : 65001
 
- Date: 10/10/2018 11:28:58
+ Date: 12/10/2018 15:44:08
 */
 
 SET NAMES utf8mb4;
@@ -23,25 +23,48 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `relationInfo`;
 CREATE TABLE `relationInfo`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `filePattern` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `sheetIndex` int(11) NULL DEFAULT NULL,
+  `minStartRnum` int(11) NULL DEFAULT NULL,
+  `batchCount` int(255) NULL DEFAULT NULL,
   `entityClass` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `mapperClass` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `msg` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of relationInfo
 -- ----------------------------
-INSERT INTO `relationInfo` VALUES (1, '我-0', 'com.neo.entity.po.CustomerInfo', 'com.neo.mapper.test1.CustomerInfoMapper', NULL);
+INSERT INTO `relationInfo` VALUES (1, 'temp.*', 0, 3, 2000, 'com.neo.entity.po.CustomerInfo', 'com.neo.mapper.test1.CustomerInfoMapper', NULL);
+INSERT INTO `relationInfo` VALUES (2, 't1emp.*', 0, 4, 100, 'com.neo.entity.po.CustomerInfo', 'com.neo.mapper.test1.CustomerInfoMapper', NULL);
 
 -- ----------------------------
--- Table structure for taskInfo
+-- Table structure for sourceInfo
 -- ----------------------------
-DROP TABLE IF EXISTS `taskInfo`;
-CREATE TABLE `taskInfo`  (
+DROP TABLE IF EXISTS `sourceInfo`;
+CREATE TABLE `sourceInfo`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `fileName` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `path` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `filePattern` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `createDate` datetime(0) NULL DEFAULT NULL,
+  `lastDate` datetime(0) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of sourceInfo
+-- ----------------------------
+INSERT INTO `sourceInfo` VALUES (1, './src/main/resources/', 'temp.*.xls', '2018-10-11 11:29:26', NULL);
+INSERT INTO `sourceInfo` VALUES (2, './src/main/resources/', 'temp1.*.xls', '2018-10-11 11:29:26', NULL);
+
+-- ----------------------------
+-- Table structure for subTaskInfo
+-- ----------------------------
+DROP TABLE IF EXISTS `subTaskInfo`;
+CREATE TABLE `subTaskInfo`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `filePath` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `sheetIndex` int(11) NULL DEFAULT NULL,
   `startRnum` int(11) NULL DEFAULT NULL,
   `endRnum` int(11) NULL DEFAULT NULL,
@@ -50,7 +73,22 @@ CREATE TABLE `taskInfo`  (
   `endDate` datetime(0) NULL DEFAULT NULL,
   `errorInfo` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2310 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for test
+-- ----------------------------
+DROP TABLE IF EXISTS `test`;
+CREATE TABLE `test`  (
+  `a` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `b` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `c` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of test
+-- ----------------------------
+INSERT INTO `test` VALUES ('1', '2', '2018-10-11 11:04:50');
 
 -- ----------------------------
 -- Table structure for users
