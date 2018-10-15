@@ -1,9 +1,9 @@
 package com.neo.mapper.test1;
 
 import com.neo.entity.po.RelationInfo;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
+import com.neo.entity.po.SubTaskInfo;
+import com.neo.entity.po.User;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -24,4 +24,20 @@ public interface RelationInfoMapper {
             @Result(property = "msg", column = "msg")
     })
     List<RelationInfo> getAll();
+
+    @Select("SELECT * FROM relationInfo where id=#{id}")
+    RelationInfo getRelationInfo(@Param(value = "id") int id);
+
+    @Insert("INSERT INTO relationInfo(filePattern,sheetIndex,minStartRnum,batchCount,entityClass,mapperClass,msg) " +
+            "VALUES(#{filePattern}, #{sheetIndex}, #{minStartRnum}, #{batchCount}, #{entityClass}, #{mapperClass}, #{msg})")
+    void insert(RelationInfo relationInfo);
+
+    @Update("UPDATE relationInfo SET filePattern=#{filePattern},sheetIndex=#{sheetIndex},minStartRnum=#{minStartRnum}," +
+            " batchCount=#{batchCount},entityClass=#{entityClass},mapperClass=#{mapperClass},msg=#{msg}" +
+            " WHERE id =#{id}")
+    void update(RelationInfo relationInfo);
+
+    @Delete("DELETE FROM relationInfo WHERE id =#{id}")
+    void delete(@Param(value = "id") int id);
+
 }

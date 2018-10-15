@@ -1,6 +1,7 @@
 package com.neo.mapper.test1;
 
 import com.neo.entity.po.CustomerInfo;
+import com.neo.entity.po.RelationInfo;
 import com.neo.entity.po.SubTaskInfo;
 import org.apache.ibatis.annotations.*;
 
@@ -39,6 +40,9 @@ public interface SubTaskInfoMapper  {
     })
     List<SubTaskInfo> getSubTaskInfosByStatus(@Param(value = "finished") int finished);
 
+    @Select("SELECT * FROM subTaskInfo where id=#{id}")
+    SubTaskInfo getSubTaskInfo(@Param(value = "id")  int id);
+
     @Insert("INSERT INTO subTaskInfo(filePath, sheetIndex, startRnum, endRnum, finished, startDate, endDate, errorInfo) " +
             "VALUES(#{filePath}, #{sheetIndex}, #{startRnum},#{endRnum}, #{finished}, #{startDate},#{endDate}, #{errorInfo})")
     void insert(SubTaskInfo subTaskInfo);
@@ -53,12 +57,17 @@ public interface SubTaskInfoMapper  {
     void insertBatch(@Param(value = "subTaskInfoList") List<SubTaskInfo> subTaskInfoList);
 
     @Delete("DELETE FROM subTaskInfo WHERE id =#{id}")
-    void deleteById(@Param(value = "id") int id);
+    void delete(@Param(value = "id") int id);
 
     @Update("UPDATE subTaskInfo SET finished=#{finished}, startDate=now(), endDate=now() WHERE id =#{id}")
     void updateStatus(@Param(value = "id") int id,@Param(value = "finished") int finished);
 
     @Update("UPDATE subTaskInfo SET finished=#{finished}, endDate=now() WHERE id =#{id}")
     void updateStatusAndEndDate(@Param(value = "id") int id,@Param(value = "finished") int finished);
+
+    @Update("UPDATE subTaskInfo SET filePath=#{filePath},sheetIndex=#{sheetIndex},startRnum=#{startRnum}," +
+            " endRnum=#{endRnum},finished=#{finished},startDate=#{startDate},endDate=#{endDate},errorInfo=#{errorInfo}" +
+            " WHERE id =#{id}")
+    void update(SubTaskInfo subTaskInfo);
 
 }
