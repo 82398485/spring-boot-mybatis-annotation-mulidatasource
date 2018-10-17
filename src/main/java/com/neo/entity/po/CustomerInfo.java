@@ -57,7 +57,7 @@ public class CustomerInfo implements Serializable,CommonEntity {
     public void cast(List list) throws Exception{
         userName = list.get(0).toString();
         weight = Double.parseDouble(list.get(1).toString());
-        age = Integer.parseInt(list.get(2).toString());
+        age = (int) Double.parseDouble(list.get(2).toString());
     }
 
 

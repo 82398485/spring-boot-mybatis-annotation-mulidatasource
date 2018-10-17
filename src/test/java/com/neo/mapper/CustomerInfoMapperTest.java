@@ -66,7 +66,7 @@ public class CustomerInfoMapperTest {
 
     @Test
     public void testAdapterInsert() throws Exception {
-         String filePath = "./src/main/resources/temp.xls";
+         String filePath = "./src/main/resources/temp.xlsx";
          int sheetIndex = 0;
          int startRnum = 3;
          int endRnum = 1000;
@@ -77,7 +77,7 @@ public class CustomerInfoMapperTest {
     @Test
     public void testThreadInsert() throws Exception {
         //SubTaskThread subTaskThread = new SubTaskThread("D:/temp.xls",0,3,1000);
-        SubTaskThread subTaskThread = new SubTaskThread(1,"./src/main/resources/temp.xls",0,3,1000);
+        SubTaskThread subTaskThread = new SubTaskThread(1,"./src/main/resources/temp.xlsx",0,3,1000);
         subTaskThread.start();
         Thread.sleep(10000);
     }
