@@ -5,13 +5,12 @@ import com.neo.entity.vo.RowItem;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTCell;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.STCellType;
-
 
 import java.io.*;
 import java.util.ArrayList;
@@ -161,6 +160,7 @@ public class ReadExcel {
         List innerList = null;
         XSSFSheet sheet = null;
         XSSFCell cell = null;
+
         try {
             // 创建输入流，读取Excel
             is = new FileInputStream(file.getAbsolutePath());
@@ -184,7 +184,7 @@ public class ReadExcel {
                         //xlsx和xls有区别，需要进行特殊处理
                         cell = sheet.getRow(i).getCell(j);
                         cellinfo = cell.toString();
-                        if(cell.getCellType()==Cell.CELL_TYPE_NUMERIC){
+                        if(cell.getCellType()== Cell.CELL_TYPE_NUMERIC){
                             cell.setCellType(Cell.CELL_TYPE_STRING);
                             cellinfo = cell.getStringCellValue();
                             if(cellinfo.contains(".")){
@@ -233,7 +233,6 @@ public class ReadExcel {
         try {
             // 创建输入流，读取Excel
             is = new FileInputStream(file.getAbsolutePath());
-            // jxl提供的Workbook类
             wb = new HSSFWorkbook(is);
             // Excel的页签数量
             int sheet_size = wb.getNumberOfSheets();
@@ -280,7 +279,6 @@ public class ReadExcel {
         try {
             // 创建输入流，读取Excel
             is = new FileInputStream(file.getAbsolutePath());
-            // jxl提供的Workbook类
             wb = new XSSFWorkbook(is);
             // Excel的页签数量
             int sheet_size = wb.getNumberOfSheets();

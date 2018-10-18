@@ -47,7 +47,7 @@ public class Controller {
         return "success";
     }
 
-
+    //HTTP的每次调用会产生一个http-nio的线程，最大维持10个这样的线程
     @RequestMapping(value="/createAllSubTask")
     public String createAllSubTask(){
         subTaskInfoService.createAllSubTask();
