@@ -7,13 +7,16 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,8 +27,8 @@ public class ReadExcel {
     public static void main(String[] args) {
         ReadExcel obj = new ReadExcel();
         // 此处为我创建Excel路径：E:/zhanhj/studysrc/jxl下
-        File file = new File("D:\\workspaces\\github\\spring-boot-readexcel\\src\\main\\resources\\temp.xlsx");
-        List excelList = ReadExcel.readExcel(file,0,1,1000);
+        File file = new File("D:\\workspaces\\github\\spring-boot-readexcel\\src\\main\\resources\\temp.xls");
+        List excelList = ReadExcel.readExcel(file,0,1,5);
         System.out.println("list中的数据打印出来");
         for (int i = 0; i < excelList.size(); i++) {
             RowItem rowItem = (RowItem) excelList.get(i);
@@ -39,43 +42,15 @@ public class ReadExcel {
         }
     }
 
-    // 去读Excel的方法readExcel，该方法的入口参数为一个File对象
-    public List readExcel(File file) {
-        try {
-            // 创建输入流，读取Excel
-            InputStream is = new FileInputStream(file.getAbsolutePath());
-            HSSFWorkbook wb = new HSSFWorkbook(is);
-            // Excel的页签数量
-            int sheet_size = wb.getNumberOfSheets();
-            for (int index = 0; index < sheet_size; index++) {
-                List<List> outerList=new ArrayList<List>();
-                // 每个页签创建一个Sheet对象
-                Sheet sheet = wb.getSheetAt(index);
-                // sheet.getRows()返回该页的总行数
-                for (int i = 0; i < sheet.getLastRowNum(); i++) {
-                    List innerList=new ArrayList();
-                    // sheet.getColumns()返回该页的总列数
-                    int columnsNum = (sheet.getRow(0)==null)?0:sheet.getRow(0).getPhysicalNumberOfCells();
-
-                    for (int j = 0; j < Math.max(columnsNum,sheet.getRow(i).getPhysicalNumberOfCells()); j++) {
-                        String cellinfo = sheet.getRow(i).getCell(j).toString();
-                        if(cellinfo.isEmpty()){
-                            continue;
-                        }
-                        innerList.add(cellinfo);
-                    }
-                    outerList.add(i, innerList);
-                }
-                return outerList;
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public static List readExcel(File file, int sheetIndex, int startRnum, int endRnum){
+        if(file.getName().endsWith("xls")){
+            return ReadExcel.readExcelXls(file,sheetIndex,startRnum,endRnum);
+        }else if(file.getName().endsWith("xlsx")){
+            return ReadExcel.readExcelXlsx(file,sheetIndex,startRnum,endRnum);
+        }else{
+            return null;
         }
-        return null;
     }
-
 
     /**
      * 去读Excel的方法readExcel，该方法的入口参数为一个File对象
@@ -85,10 +60,7 @@ public class ReadExcel {
      * @param endRnum  从0开始计数
      * @return
      */
-    public static List readExcel(File file, int sheetIndex, int startRnum, int endRnum) {
-        if(file.getName().endsWith("xlsx")){
-            return ReadExcel.readExcelXlsx(file,  sheetIndex,  startRnum, endRnum);
-        }
+    public static List readExcelXls(File file, int sheetIndex, int startRnum, int endRnum) {
         InputStream is = null;
         HSSFWorkbook wb = null;
         String cellinfo = null;
@@ -117,9 +89,7 @@ public class ReadExcel {
                     int columnsNum = (sheet.getRow(0)==null)?0:sheet.getRow(0).getPhysicalNumberOfCells();
                     for (int j = 0; sheet.getRow(i)!=null && j< Math.max(columnsNum,sheet.getRow(i).getPhysicalNumberOfCells()); j++) {
                         cell = sheet.getRow(i).getCell(j);
-                        cell.setCellType(CellType.STRING);
-                        cellinfo = cell.toString();
-                        innerList.add(cellinfo);
+                        innerList.add(ReadExcel.readCell(cell));
                     }
                     outerList.add(new RowItem(i, innerList));
                 }
@@ -181,18 +151,8 @@ public class ReadExcel {
                     //获取列数
                     int columnsNum = (sheet.getRow(0)==null)?0:sheet.getRow(0).getPhysicalNumberOfCells();
                     for (int j = 0; sheet.getRow(i)!=null && j< Math.max(columnsNum,sheet.getRow(i).getPhysicalNumberOfCells()); j++) {
-                        //xlsx和xls有区别，需要进行特殊处理
                         cell = sheet.getRow(i).getCell(j);
-                        cellinfo = cell.toString();
-                        if(cell.getCellType()== Cell.CELL_TYPE_NUMERIC){
-                            cell.setCellType(Cell.CELL_TYPE_STRING);
-                            cellinfo = cell.getStringCellValue();
-                            if(cellinfo.contains(".")){
-                                cellinfo = String.valueOf(new Double(cellinfo));
-                            }else{
-                            }
-                        }
-                        innerList.add(cellinfo);
+                        innerList.add(readCell(cell));
                     }
                     outerList.add(new RowItem(i, innerList));
                 }
@@ -225,7 +185,14 @@ public class ReadExcel {
     public static List<FileSheetItemInfo> getFileSheetItemInfos(File file) {
         if(file.getName().endsWith("xlsx")){
             return ReadExcel.getFileSheetItemInfosXlsx(file);
+        }else if(file.getName().endsWith("xls")){
+            return ReadExcel.getFileSheetItemInfosXls(file);
+        }else{
+            return null;
         }
+    }
+
+    public static List<FileSheetItemInfo> getFileSheetItemInfosXls(File file) {
         List<FileSheetItemInfo> result = new ArrayList<>();
         FileSheetItemInfo fileSheetItemInfo = null;
         InputStream is = null;
@@ -264,7 +231,6 @@ public class ReadExcel {
         }
         return null;
     }
-
 
     /**
      * 获取EXCEL表格sheet页相关信息
@@ -309,6 +275,56 @@ public class ReadExcel {
             }
         }
         return null;
+    }
+
+    public static String readCell(Cell cell){
+        String cellinfo = "";
+        if(cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+            if(DateUtil.isCellDateFormatted(cell)){ //日期类型
+                Date date = cell.getDateCellValue();
+                cellinfo = DateUtils.formatDatetime(date);
+            }else{
+                short format = cell.getCellStyle().getDataFormat();
+                System.out.println("format:"+format+";;;;;value:"+cell.getNumericCellValue());
+                SimpleDateFormat sdf = null;
+                if (format == 14 || format == 31 || format == 57 || format == 58
+                        || (176<=format && format<=178) || (182<=format && format<=196)
+                        || (210<=format && format<=213) || (208==format ) ) { // 日期
+                    sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    double value = cell.getNumericCellValue();
+                    Date date = org.apache.poi.ss.usermodel.DateUtil.getJavaDate(value);
+                    if(date==null||"".equals(date)){
+                        cellinfo = "";
+                    }else{
+                        cellinfo = DateUtils.formatDateByPattern(date,sdf.toPattern());
+                    }
+                } else if (format == 20 || format == 32 || format==183 || (200<=format && format<=209) ) { // 时间
+                    sdf = new SimpleDateFormat("HH:mm");
+                    double value = cell.getNumericCellValue();
+                    Date date = org.apache.poi.ss.usermodel.DateUtil.getJavaDate(value);
+                    if(date==null||"".equals(date)){
+                        cellinfo = "";
+                    }else{
+                        cellinfo = DateUtils.formatDateByPattern(date,sdf.toPattern());
+                    }
+                }else{
+                    //数值型
+                    cell.setCellType(Cell.CELL_TYPE_STRING);
+                    cellinfo = cell.getStringCellValue();
+                    if (cellinfo.contains(".")) {
+                        cellinfo = String.valueOf(new Double(cellinfo));
+                    } else {
+                    }
+                }
+            }
+        }else if(cell.getCellType()==Cell.CELL_TYPE_FORMULA){
+            cell.setCellType(CellType.STRING);
+            cellinfo = String.valueOf(cell.getStringCellValue());
+        }else{
+            cellinfo = cell.toString();
+        }
+
+        return cellinfo;
     }
 
 
