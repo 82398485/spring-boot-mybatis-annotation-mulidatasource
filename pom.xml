@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.neo</groupId>
-	<artifactId>spring-boot-mybatis-annotation-mulidatasource</artifactId>
+	<artifactId>spring-boot-readexcel</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
